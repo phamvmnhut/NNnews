@@ -7,27 +7,240 @@
  */
 
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import { 
+  Alert, 
+  Image, 
+  Platform, 
+  StyleSheet, 
+  Text, 
+  TouchableHighlight, 
+  View,
+  YellowBox,
+  ScrollView,
+} from 'react-native';
 
-export default class Setting extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+import PropTypes from 'prop-types';
+
+class CheckedItems {
+  constructor() {
+    _checkedItems = [];
   }
+
+  addItem(option) {
+    _checkedItems.push(option);
+  }
+  fetchCheckedItems() {
+    return _checkedItems;
+  }
+}
+class Checkbox extends Component {
+  constructor() {
+    super();
+    this.state = { checked: null }
+  }
+
+  componentDidMount() {
+    if (this.props.checked) {
+      this.setState({ checked: true}, () => {
+        this.props.checkedObjArr.addItem({
+          'key': this.props.keyValue,
+          'value': this.props.value,
+          'label': this.props.label
+        });
+      });
+    } else {
+      this.setState({ checked: false });
+    }
+  }
+
+  stateSwitcher(key, value, label) {
+    this.setState({ checked: !this.state.checked}, () =>{
+      if (this.state.checked) {
+        this.props.checkedObjArr.addItem({
+          'key': key,
+          'value': value,
+          'label': label
+        });
+      } else {
+        this.props.checkedObjArr.fetchCheckedItems().splice(
+          this.props.checkedObjArr.fetchCheckedItems().findIndex(y => y.key == key), 1
+        );
+        
+      }
+    });
+  }
+
   render() {
-    const {container} = styles;
     return (
-      <View style={container}>
-        <Text>Setting Component</Text>
-      </View>
+      <TouchableHighlight
+        onPress={this.stateSwitcher.bind(this, this.props.keyValue, this.props.label, this.props.value)} 
+        underlayColor="transparent"
+        style={{marginVertical: 20}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{
+            padding: 4, 
+            width: this.props.size, 
+            height: this.props.size, 
+            backgroundColor: this.props.color
+          }}>
+            {
+              (this.state.checked) 
+                ?
+                (<View style={styles.selectedUI}>
+                  <Image source={require('./assets/tick.png')} style={styles.checkboxTickImg} />
+                </View>)
+                :
+                (<View style={styles.uncheckedCheckbox} />)
+            }
+          </View>
+          <Text style={[styles.checkboxLabel, {color: this.props.labelColor}]}> 
+            {this.props.label}{' '} 
+          </Text>
+        </View>
+      </TouchableHighlight>
     );
   }
 }
 
+export default class Setting extends Component {
+  constructor(props) {
+    super(props);
+    // eslint-disable-next-line no-undef
+    //checkedArrObject = new CheckedItems();
+    CheckedArrObject = new CheckedItems();
+    this.state = {pickedElements: ''}
+  }
+
+  renderCheckedItem() {
+    if (CheckedArrObject.fetchArray().length == 0) {
+      Alert.alert('No Item Selected');
+    } else {
+      this.setState(() => {
+        return {
+          pickedElements: CheckedArrObject.fetchArray().map((res) => res.value).join(),
+        };
+      });
+    }
+  }
+
+  render() {
+    return (
+      <View>
+        <ScrollView style={{flexGrow:1, flexDirection: 'column', backgroundColor: 'yellow'}}>
+          <View style={styles.CheckboxContainer}>
+            <Checkbox size={45}
+              keyValue={1}
+              checked={true}
+              color="#E81E63"
+              labelColor="#000000"
+              label="Birds of Prey"
+              value="birds_of_prey" 
+              checkedObjArr={CheckedArrObject} /> 
+
+            <Checkbox size={45}
+              keyValue={2}
+              checked={false}
+              color="#3F50B5"
+              labelColor="#000000"
+              label="Little Women"
+              value="little_women" 
+              checkedObjArr={CheckedArrObject} /> 
+
+            <Checkbox size={45}
+              keyValue={3}
+              checked={true}
+              color="#009688"
+              labelColor="#000000"
+              label="Doctor Sleep"
+              value="doctor_sleep"
+              checkedObjArr={CheckedArrObject} /> 
+
+            <Checkbox size={45}
+              keyValue={4}
+              checked={false}
+              color="#FF9800"
+              labelColor="#000000"
+              label="Ford v Ferrari"
+              value="ford_v_ferrari"
+              checkedObjArr={CheckedArrObject} />      
+             <Text style={{ fontSize: 22, color: "#000", marginTop: 25 }}> {this.state.pickedElements} </Text> 
+            
+          </View>
+        </ScrollView>
+        <TouchableHighlight style={styles.showSearchButton} onPress={this.renderCheckedItem}>
+          <Text style={styles.buttonText}>Search for Recommended...</Text>
+        </TouchableHighlight>
+       
+      </View>
+    );
+  }
+}
+Checkbox.propTypes = {
+  keyValue: PropTypes.number.isRequired,
+  size: PropTypes.number,
+  color: PropTypes.string,
+  label: PropTypes.string,
+  value: PropTypes.string,
+  checked: PropTypes.bool,
+  labelColor: PropTypes.string,
+  checkedObjArr: PropTypes.object.isRequired,
+}
+
+Checkbox.defaultProps = {
+  size: 32,
+  checked: false,
+  value: 'Default',
+  label: 'Default',
+  color: '#cecece',
+  labelColor: '000000',    
+}
+
 const styles = StyleSheet.create({
-  container: {
+  CheckboxContainer: {
+    flex: 1,
+    padding: 22,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+    paddingTop: (Platform.OS === 'ios') ? 25 : 0
+  },
+
+  showSearchButton: {
+    flex: 1,
+    padding: 40,
+    //marginTop: 22,
+    flexDirection: 'column',//Should not be changed
+    justifyContent: 'center',//Don't change this
+    alignSelf: 'stretch',
+    backgroundColor: '#5D52FF'
+  },
+
+  buttonText: {
+    fontSize: 20,
+    color: '#ffffff',
+    textAlign: 'center',
+    alignSelf: 'stretch'
+  },
+
+  selectedUI: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
+  },
+
+  checkboxTickImg: {
+    width: '100%',
+    height: '100%',
+    //tintColor: '#ffffff',//Change image into color 
+    resizeMode: 'contain'
+  },
+
+  uncheckedCheckbox: {
+    flex: 1,
+    backgroundColor: '#ffffff'
+  },
+
+  checkboxLabel: {
+    fontSize: 18,
+    paddingLeft: 15
   },
 });
