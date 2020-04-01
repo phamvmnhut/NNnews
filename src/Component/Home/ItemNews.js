@@ -46,7 +46,7 @@ class ItemNews extends Component {
     return (
       <TouchableOpacity
         ref="rootView"
-        onPress={() => Alert.alert('news item')}
+        onPress={() => this.props.navigation.push('ReadNews', {url: item.url})}
         style={container}>
         <View style={imageStyle}>
           <Text>Image</Text>

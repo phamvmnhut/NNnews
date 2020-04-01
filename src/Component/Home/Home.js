@@ -110,9 +110,9 @@ export default class Home extends Component {
     return (
       <View style={container}>
         <FlatList
-          style={styles.flatlist}
+          style={flatlist}
           data={this.state.articles}
-          renderItem={({item}) => <ItemNews item={item} />}
+          renderItem={({item}) => <ItemNews item={item} {...this.props} />}
           refreshing={this.state.isRefreshing}
           onRefresh={this.handleRefresh.bind(this)}
           keyExtractor={(item) => item.url}
