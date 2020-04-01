@@ -23,14 +23,14 @@ import PropTypes from 'prop-types';
 
 class CheckedItems {
   constructor() {
-    _checkedItems = [];
+    this._checkedItems = [];
   }
 
   addItem(option) {
-    _checkedItems.push(option);
+    this._checkedItems.push(option);
   }
   fetchCheckedItems() {
-    return _checkedItems;
+    return this._checkedItems;
   }
 }
 class Checkbox extends Component {
@@ -107,68 +107,82 @@ export default class Setting extends Component {
     super(props);
     // eslint-disable-next-line no-undef
     //checkedArrObject = new CheckedItems();
-    CheckedArrObject = new CheckedItems();
+    this.CheckedArrObject = new CheckedItems();
     this.state = {pickedElements: ''}
   }
 
   renderCheckedItem() {
-    if (CheckedArrObject.fetchArray().length == 0) {
+    const checkedItemGetted = this.CheckedArrObject.fetchCheckedItems();
+    if (checkedItemGetted.length == 0) {
       Alert.alert('No Item Selected');
     } else {
       this.setState(() => {
         return {
-          pickedElements: CheckedArrObject.fetchArray().map((res) => res.value).join(),
-        };
-      });
+          pickedElements: checkedItemGetted.map((res) => res.value).join()
+        }}
+      );
     }
   }
 
   render() {
     return (
-      <View>
-        <ScrollView style={{flexGrow:1, flexDirection: 'column', backgroundColor: 'yellow'}}>
+      <View style={{flex:1}}>
+        <ScrollView scrollContentStyle={{
+          flexGrow: 1, 
+          flexDirection: 'column', 
+          //backgroundColor: 'yellow', 
+          justifyContent: 'space-between',
+          }}>
           <View style={styles.CheckboxContainer}>
-            <Checkbox size={45}
+            <Checkbox 
+              size={45}
               keyValue={1}
               checked={true}
               color="#E81E63"
               labelColor="#000000"
               label="Birds of Prey"
               value="birds_of_prey" 
-              checkedObjArr={CheckedArrObject} /> 
+              checkedObjArr={this.CheckedArrObject} 
+            /> 
 
-            <Checkbox size={45}
+            <Checkbox 
+              size={45}
               keyValue={2}
               checked={false}
               color="#3F50B5"
               labelColor="#000000"
               label="Little Women"
               value="little_women" 
-              checkedObjArr={CheckedArrObject} /> 
+              checkedObjArr={this.CheckedArrObject} 
+            /> 
 
-            <Checkbox size={45}
+            <Checkbox
+              size={45}
               keyValue={3}
               checked={true}
               color="#009688"
               labelColor="#000000"
               label="Doctor Sleep"
               value="doctor_sleep"
-              checkedObjArr={CheckedArrObject} /> 
+              checkedObjArr={this.CheckedArrObject} 
+            /> 
 
-            <Checkbox size={45}
+            <Checkbox 
+              size={45}
               keyValue={4}
               checked={false}
               color="#FF9800"
               labelColor="#000000"
               label="Ford v Ferrari"
               value="ford_v_ferrari"
-              checkedObjArr={CheckedArrObject} />      
+              checkedObjArr={this.CheckedArrObject}
+            />
              <Text style={{ fontSize: 22, color: "#000", marginTop: 25 }}> {this.state.pickedElements} </Text> 
             
           </View>
         </ScrollView>
-        <TouchableHighlight style={styles.showSearchButton} onPress={this.renderCheckedItem}>
-          <Text style={styles.buttonText}>Search for Recommended...</Text>
+        <TouchableHighlight style={styles.SearchButton} onPress={this.renderCheckedItem()}>
+          <Text style={styles.SearchButtonText}>Search for Recommended...</Text>
         </TouchableHighlight>
        
       </View>
@@ -200,13 +214,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 22,
     alignItems: 'flex-start',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     paddingTop: (Platform.OS === 'ios') ? 25 : 0
   },
 
-  showSearchButton: {
-    flex: 1,
-    padding: 40,
+  SearchButton: {
+    flex: 0,
+    padding: 20,
     //marginTop: 22,
     flexDirection: 'column',//Should not be changed
     justifyContent: 'center',//Don't change this
@@ -214,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#5D52FF'
   },
 
-  buttonText: {
+  SearchButtonText: {
     fontSize: 20,
     color: '#ffffff',
     textAlign: 'center',
@@ -240,6 +254,7 @@ const styles = StyleSheet.create({
   },
 
   checkboxLabel: {
+    
     fontSize: 18,
     paddingLeft: 15
   },
